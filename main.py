@@ -74,7 +74,6 @@ class Main:
             self.client.pump()
         if self.server:
             self.server.pump()
-            # TODO: Handle disconnected clients.
 
     def events(self):
         """Handle the pygame events."""
