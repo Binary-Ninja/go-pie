@@ -24,20 +24,9 @@ pyngrok should be able to find your token. This will allow your public servers t
 
 
 ## The Config File
-As there is no GUI for the application yet, a file named `config.json` holds the required data.
+A file named `config.json` holds the default settings.
 
 - `"screen_resolution"` - The starting resolution of the display. The display can be resized.
-- `"default_port"` - The port on localhost that servers will be created on.
+- `"default_host"` - The default host for servers and clients.
+- `"default_port"` - The default port for servers and clients.
 - `"public_server"` - A boolean that specifies whether to use `pyngrok` to open the server publicly.
-- `"server_address"` - A string of the form `"host:port"` that specifies what IP to connect to as a client.
-
-## Controls
-Close the window to exit the program.
-
-Press `H` to create a server on localhost and join a client to that server.
-The server's port can be specified in the config file.
-The server will be opened publicly if specified in the config file.
-
-Press `J` to create a client and join the server address in the config file.
-
-Press `Q` to quit the server and/or client that is running.
