@@ -3,8 +3,6 @@
 
 # Standard library imports.
 import sys
-import json
-from pathlib import Path
 
 # Third-party library imports.
 import pygame as pg
@@ -17,29 +15,9 @@ except ImportError:
     ngrok = None
 
 # Local library imports.
+from config import *
 from server import PieServer
 from client import PieClient
-
-
-# Try to load in the config file.
-try:
-    # Decode json configuration file.
-    with open(Path() / "config.json", "r") as file:
-        config_data = json.load(file)
-except FileNotFoundError:
-    # The file doesn't exist, so create an empty configuration.
-    config_data = {}
-
-# Extract configuration data with default values.
-# The starting screen resolution.
-DEFAULT_SIZE = config_data.get("screen_resolution", (800, 600))
-# The default port to host servers on.
-DEFAULT_PORT = config_data.get("default_port", 5071)
-# Whether the server is public with ngrok or not.
-PUBLIC_SERVER = config_data.get("public_server", False)
-# The address of the server for clients to join.
-SERVER_ADDRESS = config_data.get("server_address", f"localhost:{DEFAULT_PORT}").split(":")
-SERVER_ADDRESS = SERVER_ADDRESS[0], int(SERVER_ADDRESS[1])  # Create a tuple of (host, port).
 
 
 class Main:
@@ -48,7 +26,7 @@ class Main:
         # Initialize pygame.
         pg.init()
         # Create the display.
-        self.screen = pg.display.set_mode(DEFAULT_SIZE, pg.RESIZABLE)
+        self.screen = pg.display.set_mode(DEFAULT_SCREEN_SIZE, pg.RESIZABLE)
         # Set the screen caption.
         pg.display.set_caption("Go Pie")
         # The clock to keep track of dt and fps.
@@ -90,7 +68,7 @@ class Main:
                 if event.key == pg.K_h:
                     # Create and join localhost server if no client is running.
                     if self.client is None:
-                        self.server = PieServer(localaddr=("localhost", DEFAULT_PORT))
+                        self.server = PieServer(localaddr=(DEFAULT_HOST, DEFAULT_PORT))
                         self.client = PieClient(self.server.address)
                         # Make the server public.
                         if PUBLIC_SERVER:
@@ -107,7 +85,7 @@ class Main:
                 elif event.key == pg.K_j:
                     # Join the server as specified in config if no client is running.
                     if self.client is None:
-                        self.client = PieClient(SERVER_ADDRESS)
+                        self.client = PieClient((DEFAULT_HOST, DEFAULT_PORT))
 
                 elif event.key == pg.K_q:
                     # Quit the server and client, if running.
