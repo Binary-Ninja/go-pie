@@ -5,10 +5,13 @@ import pygame as pg
 
 # Export the global assets.
 __all__ = [
+    # Fonts.
     "DEFAULT_FONT",
+    # Colors.
     "BLACK",
     "WHITE",
     "GRAY",
+    # Misc.
     "VALID_CHARS",
 ]
 

@@ -1,5 +1,8 @@
 """The file to contain all scene classes."""
 
+# Standard library imports.
+from enum import Enum, auto
+
 # Third party library imports.
 import pygame as pg
 
@@ -7,12 +10,29 @@ import pygame as pg
 from config import *
 from assets import *
 
-# Export the scenes.
+# Export the required classes.
 __all__ = [
+    # Scene classes.
     "StartScene",
     "HostScene",
     "JoinScene",
+    # Scene transition enum.
+    "NextScene",
 ]
+
+
+class NextScene(Enum):
+    """A simple Enum for scene transition values."""
+    def _generate_next_value_(name, start, count, last_values):
+        """The scene transition values are strings of their name."""
+        return name
+
+    QUIT = auto()
+    START = auto()
+    HOST = auto()
+    JOIN = auto()
+    GAME_HOST = auto()
+    GAME_JOIN = auto()
 
 
 class BaseScene:
@@ -74,18 +94,18 @@ class StartScene(BaseScene):
             if event.type == pg.KEYDOWN:
                 # Check for key commands.
                 if event.key == pg.K_ESCAPE:
-                    self.next_scene = "quit"
+                    self.next_scene = NextScene.QUIT
                 elif event.key == pg.K_h:
-                    self.next_scene = "host"
+                    self.next_scene = NextScene.HOST
                 elif event.key == pg.K_j:
-                    self.next_scene = "join"
+                    self.next_scene = NextScene.JOIN
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.host_button_rect.collidepoint(event.pos):
-                        self.next_scene = "host"
+                        self.next_scene = NextScene.HOST
                     elif self.join_button_rect.collidepoint(event.pos):
-                        self.next_scene = "join"
+                        self.next_scene = NextScene.JOIN
 
     def draw(self, screen):
         screen.blit(self.host_button_img, self.host_button_rect)
@@ -124,16 +144,16 @@ class HostScene(BaseScene):
             if event.type == pg.KEYDOWN:
                 # Check for key commands.
                 if event.key == pg.K_RETURN:
-                    self.next_scene = "game"
+                    self.next_scene = NextScene.GAME_HOST
                 elif event.key == pg.K_ESCAPE:
-                    self.next_scene = "start"
+                    self.next_scene = NextScene.START
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.start_button_rect.collidepoint(event.pos):
-                        self.next_scene = "game"
+                        self.next_scene = NextScene.GAME_HOST
                     elif self.back_button_rect.collidepoint(event.pos):
-                        self.next_scene = "start"
+                        self.next_scene = NextScene.START
 
     def draw(self, screen):
         screen.blit(self.start_button_img, self.start_button_rect)
@@ -188,9 +208,9 @@ class JoinScene(BaseScene):
             if event.type == pg.KEYDOWN:
                 # Check for key commands.
                 if event.key == pg.K_RETURN:
-                    self.next_scene = "game"
+                    self.next_scene = NextScene.GAME_JOIN
                 elif event.key == pg.K_ESCAPE:
-                    self.next_scene = "start"
+                    self.next_scene = NextScene.START
                 elif event.key == pg.K_BACKSPACE:
                     # If there is text, delete one character.
                     if self.text:
@@ -202,15 +222,15 @@ class JoinScene(BaseScene):
                     self.update_text_box()
                 elif event.key in VALID_CHARS:
                     # Add one character to the text, taking into account the shift key.
-                    self.text += VALID_CHARS[event.key][event.mod & pg.KMOD_SHIFT]
+                    self.text += VALID_CHARS[event.key][bool(event.mod & pg.KMOD_SHIFT)]
                     self.update_text_box()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.start_button_rect.collidepoint(event.pos):
-                        self.next_scene = "game"
+                        self.next_scene = NextScene.GAME_JOIN
                     elif self.back_button_rect.collidepoint(event.pos):
-                        self.next_scene = "start"
+                        self.next_scene = NextScene.START
 
     def draw(self, screen):
         screen.blit(self.start_button_img, self.start_button_rect)

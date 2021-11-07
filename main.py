@@ -41,13 +41,13 @@ class Main:
         self.dt = self.clock.tick()
         # Switch scenes.
         if scene := self.scene.next_scene:
-            if scene == "quit":
+            if scene == NextScene.QUIT:
                 self.terminate()
-            elif scene == "start":
+            elif scene == NextScene.START:
                 self.scene = StartScene(self.screen_rect)
-            elif scene == "host":
+            elif scene == NextScene.HOST:
                 self.scene = HostScene(self.screen_rect)
-            elif scene == "join":
+            elif scene == NextScene.JOIN:
                 self.scene = JoinScene(self.screen_rect)
         # Pump the network classes in the current scene.
         self.scene.pump()
