@@ -10,7 +10,7 @@ import pygame as pg
 # Local library imports.
 from config import *
 from assets import *
-from scenes import *
+from scenes import NextScene, StartScene, HostScene, JoinScene
 
 
 class Main:

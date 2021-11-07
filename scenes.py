@@ -10,16 +10,6 @@ import pygame as pg
 from config import *
 from assets import *
 
-# Export the required classes.
-__all__ = [
-    # Scene classes.
-    "StartScene",
-    "HostScene",
-    "JoinScene",
-    # Scene transition enum.
-    "NextScene",
-]
-
 
 class NextScene(Enum):
     """A simple Enum for scene transition values."""
