@@ -1,6 +1,6 @@
 """The client side for Go Pie."""
 
-# Third-party library imports.
+# Third party library imports.
 from podsixnet2.Connection import connection, ConnectionListener
 
 

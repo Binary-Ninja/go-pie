@@ -4,6 +4,14 @@
 import json
 from pathlib import Path
 
+# Export the configuration variables.
+__all__ = [
+    "DEFAULT_SCREEN_SIZE",
+    "DEFAULT_HOST",
+    "DEFAULT_PORT",
+    "PUBLIC_SERVER",
+]
+
 # Try to load in the config file.
 try:
     # Decode json configuration file.
@@ -22,11 +30,3 @@ DEFAULT_HOST = config_data.get("default_host", "127.0.0.1")
 DEFAULT_PORT = config_data.get("default_port", 5071)
 # Whether the server is public with ngrok or not.
 PUBLIC_SERVER = config_data.get("public_server", False)
-
-# Only export the constant variables.
-__all__ = [
-    "DEFAULT_SCREEN_SIZE",
-    "DEFAULT_HOST",
-    "DEFAULT_PORT",
-    "PUBLIC_SERVER",
-]

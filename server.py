@@ -1,6 +1,6 @@
 """The server side for Go Pie."""
 
-# Third-party library imports.
+# Third party library imports.
 from podsixnet2.Channel import Channel
 from podsixnet2.Server import Server
 
