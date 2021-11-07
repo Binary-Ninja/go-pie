@@ -30,16 +30,25 @@ class Main:
         # Keep track of the current scene.
         self.scene = StartScene(self.screen_rect)
 
+    def terminate(self):
+        """Close the window and end the process."""
+        pg.quit()
+        sys.exit()
+
     def pump(self):
         """Tick the clock and pump network classes."""
         # Tick clock once per game loop for dt and fps.
         self.dt = self.clock.tick()
         # Switch scenes.
         if scene := self.scene.next_scene:
-            if scene == "start":
+            if scene == "quit":
+                self.terminate()
+            elif scene == "start":
                 self.scene = StartScene(self.screen_rect)
             elif scene == "host":
                 self.scene = HostScene(self.screen_rect)
+            elif scene == "join":
+                self.scene = JoinScene(self.screen_rect)
         # Pump the network classes in the current scene.
         self.scene.pump()
 
@@ -51,8 +60,7 @@ class Main:
         for event in events:
             if event.type == pg.QUIT:
                 # The window has been closed.
-                pg.quit()
-                sys.exit()
+                self.terminate()
             elif event.type == pg.VIDEORESIZE:
                 # The window has been resized.
                 self.screen = pg.display.set_mode(event.size, pg.RESIZABLE)
