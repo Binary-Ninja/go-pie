@@ -13,10 +13,6 @@ from assets import *
 
 class NextScene(Enum):
     """A simple Enum for scene transition values."""
-    def _generate_next_value_(name, start, count, last_values):
-        """The scene transition values are strings of their name."""
-        return name
-
     QUIT = auto()
     START = auto()
     HOST = auto()
