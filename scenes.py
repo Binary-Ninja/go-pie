@@ -68,6 +68,7 @@ class StartScene(BaseScene):
         # Create the widgets.
         self.host_button = Widget(DEFAULT_FONT.render("(H)ost Server", True, BLACK, GRAY))
         self.join_button = Widget(DEFAULT_FONT.render("(J)oin Server", True, BLACK, GRAY))
+        self.quit_button = Widget(DEFAULT_FONT.render("(ESC) Quit", True, BLACK, GRAY))
         # Position the widgets on the screen.
         self.position_widgets()
 
@@ -75,8 +76,10 @@ class StartScene(BaseScene):
         """Places the widgets in their proper place on screen."""
         self.host_button.rect.centerx = self.screen_rect.centerx
         self.join_button.rect.centerx = self.screen_rect.centerx
-        self.host_button.rect.centery = self.screen_rect.centery - self.host_button.rect.height - 10
-        self.join_button.rect.centery = self.screen_rect.centery + 10
+        self.quit_button.rect.centerx = self.screen_rect.centerx
+        self.host_button.rect.bottom = self.screen_rect.centery - self.join_button.rect.height
+        self.join_button.rect.centery = self.screen_rect.centery
+        self.quit_button.rect.top = self.screen_rect.centery + self.join_button.rect.height
 
     def update_screen_size(self, screen_rect):
         self.screen_rect = screen_rect
@@ -99,10 +102,13 @@ class StartScene(BaseScene):
                         self.next_scene = NextScene.HOST
                     elif self.join_button.rect.collidepoint(event.pos):
                         self.next_scene = NextScene.JOIN
+                    elif self.quit_button.rect.collidepoint(event.pos):
+                        self.next_scene = NextScene.QUIT
 
     def draw(self, screen):
         self.host_button.draw(screen)
         self.join_button.draw(screen)
+        self.quit_button.draw(screen)
 
 
 class HostScene(BaseScene):
