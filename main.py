@@ -10,7 +10,7 @@ import pygame as pg
 # Local library imports.
 from config import *
 from assets import *
-from scenes import NextScene, StartScene, HostScene, JoinScene
+from scenes import NextScene, StartScene, HostScene, JoinScene, GameScene
 
 
 class Main:
@@ -49,6 +49,8 @@ class Main:
                 self.scene = HostScene(self.screen_rect)
             elif scene == NextScene.JOIN:
                 self.scene = JoinScene(self.screen_rect)
+            elif scene == NextScene.GAME:
+                self.scene = GameScene(self.screen_rect, **self.scene.kwargs)
         # Pump the network classes in the current scene.
         self.scene.pump()
 

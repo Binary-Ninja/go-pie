@@ -4,6 +4,9 @@
 from podsixnet2.Channel import Channel
 from podsixnet2.Server import Server
 
+# Local library imports.
+from config import *
+
 
 class ClientChannel(Channel):
     """The server representation of a client."""
@@ -21,16 +24,14 @@ class ClientChannel(Channel):
 
 class PieServer(Server):
     """The server class for Go Pie."""
-
-    # The server representation of a client class.
-    channelClass = ClientChannel
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, address=(DEFAULT_HOST, DEFAULT_PORT), players=2):
         """Initialize the server."""
-        super().__init__(*args, **kwargs)
+        super().__init__(ClientChannel, address)
         # Save the server address.
-        self.address = kwargs["localaddr"]
-        print(f"[Server] Server started on {self.address[0]}:{self.address[1]}")
+        self.address = address
+        print(f"[Server] Server started on {self.get_address()}")
+        # The number of players to wait for.
+        self.number_of_players = players
 
     def get_address(self):
         """Returns the server address as a string "host:port"."""
@@ -51,12 +52,12 @@ class PieServer(Server):
 
     def quit(self):
         """Shut down the server."""
-        # Log the server shutting down.
-        print("[Server] Shut down.")
         # Tell the clients that the server has shut down.
         for client in self.channels:
             client.Send({"action": "disconnected", "shutdown": True})
         # Pump the quit messages to the clients.
         self.Pump()
+        # Log the server shutting down.
+        print("[Server] Shut down.")
         # Close the server.
         self.close()

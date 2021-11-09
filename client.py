@@ -3,11 +3,13 @@
 # Third party library imports.
 from podsixnet2.Connection import connection, ConnectionListener
 
+# Local library imports.
+from config import *
+
 
 class PieClient(ConnectionListener):
     """The client for the PieServer."""
-
-    def __init__(self, address=("127.0.0.1", 5071)):
+    def __init__(self, address=(DEFAULT_HOST, DEFAULT_PORT)):
         """Create new instance of a client and connect to the given server address."""
         # Connect to the server address.
         self.Connect(address)
@@ -18,7 +20,7 @@ class PieClient(ConnectionListener):
         """Returns the client address as a string "host:port".
 
         If the server has yet to confirm a valid connection, returns "None"."""
-        return None if self.address is None else f"{self.address[0]}:{self.address[1]}"
+        return f"{self.address[0]}:{self.address[1]}" if self.address else None
 
     def pump(self):
         """Pump the network classes.
@@ -35,7 +37,7 @@ class PieClient(ConnectionListener):
         """The server has confirmed it is valid."""
         # Store the address of the client.
         self.address = data['address']
-        print(f"[Client] Confirmed address {self.address[0]}:{self.address[1]}")
+        print(f"[Client] Confirmed address {self.get_address()}")
 
     def Network_error(self, data):
         """Log the socket errors that occur."""
