@@ -70,6 +70,9 @@ class BaseScene:
     def draw(self, screen):
         """Draw everything in the scene."""
 
+    def quit(self):
+        """Safely quit the scene."""
+
 
 class StartScene(BaseScene):
     """The first scene the user sees.
@@ -348,7 +351,7 @@ class GameScene(BaseScene):
             address = address[0], int(address[1])
         self.client = PieClient(self, address)
         # Create the widgets.
-        text = "Not Hosting"
+        text = "Not hosting"
         if self.server:
             if public:
                 text = f"{self.tunnel.public_url.removeprefix('tcp://')}"
@@ -356,19 +359,19 @@ class GameScene(BaseScene):
                 text = f"{self.server.get_address()}"
         self.address_text = Widget(DEFAULT_FONT.render(f"Server: {text}", True, BLACK, GRAY))
         # Create the client status box.
-        self.client_status = Widget(DEFAULT_FONT.render("Server not found.", True, BLACK, GRAY))
+        self.client_status = Widget(DEFAULT_FONT.render("Client: No server", True, BLACK, GRAY))
         # Position the widgets.
         self.position_widgets()
 
     def position_widgets(self):
         """Place the widgets in their proper place on screen."""
         self.address_text.rect.midtop = self.screen_rect.midtop
-        self.client_status.rect.center = self.screen_rect.center
+        self.client_status.rect.midtop = self.address_text.rect.midbottom
 
     def update_client_status(self, status):
         """Called from the PieClient on certain Network events."""
         self.client_status = Widget(DEFAULT_FONT.render(status, True, BLACK, GRAY))
-        self.client_status.rect.center = self.screen_rect.center
+        self.client_status.rect.midtop = self.address_text.rect.midbottom
 
     def update_screen_size(self, screen_rect):
         self.screen_rect = screen_rect
@@ -384,16 +387,19 @@ class GameScene(BaseScene):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.next_scene = NextScene.START
-                    # Quit the client.
-                    self.client.quit()
-                    # Quit the server.
-                    if self.server:
-                        self.server.quit()
-                        # Take the tunnel offline.
-                        if self.tunnel:
-                            ngrok.disconnect(self.tunnel.public_url)
-                            print("[Server] ngrok tunnel offline.")
+                    self.quit()
 
     def draw(self, screen):
         self.address_text.draw(screen)
         self.client_status.draw(screen)
+
+    def quit(self):
+        # Quit the client.
+        self.client.quit()
+        # Quit the server.
+        if self.server:
+            self.server.quit()
+            # Take the tunnel offline.
+            if self.tunnel:
+                ngrok.disconnect(self.tunnel.public_url)
+                print("[Server] ngrok tunnel offline.")

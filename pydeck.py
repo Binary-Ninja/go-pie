@@ -262,10 +262,10 @@ class Stack:
     def __repr__(self):
         return "Stack({})".format(str(self))
 
-    def __list__(self):
+    def list(self):
         return self.cards
 
-    def __tuple__(self):
+    def tuple(self):
         return tuple(self.cards)
 
     def __set__(self):
@@ -321,7 +321,7 @@ class Stack:
             raise ValueError("end is not 'TOP' or 'BOTTOM'")
 
     def deal(self, num=1, end=TOP):
-        stack = Stack()
+        stack = []
         if end is TOP:
             x = 0
         elif end is BOTTOM:
@@ -330,11 +330,11 @@ class Stack:
             raise ValueError("end is not 'TOP' or 'BOTTOM'")
         for i in range(num):
             try:
-                stack.add(self.cards[x])
+                stack.append(self.cards[x])
                 del self.cards[x]
             except IndexError:
-                return stack
-        return stack
+                return Stack(stack)
+        return Stack(stack)
 
     def empty(self, return_cards=False):
         if return_cards:

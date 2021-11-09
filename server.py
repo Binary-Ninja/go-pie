@@ -6,10 +6,14 @@ from podsixnet2.Server import Server
 
 # Local library imports.
 from config import *
+import pydeck as pd
 
 
 class ClientChannel(Channel):
     """The server representation of a client."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hand = pd.Stack()
 
     def get_address(self):
         """Returns the client address as a string "host:port"."""
@@ -32,6 +36,8 @@ class PieServer(Server):
         print(f"[Server] Server started on {self.get_address()}")
         # The number of players to wait for.
         self.max_clients = players
+        # The deck of the game.
+        self.deck = pd.new_deck(shuffle=True)
 
     def get_address(self):
         """Returns the server address as a string "host:port"."""
@@ -43,6 +49,10 @@ class PieServer(Server):
         Should be called once per game loop."""
         self.Pump()
 
+    def send_all(self, data):
+        """Sends the network data to all clients in channel list."""
+        [client.Send(data) for client in self.channels]
+
     def Connected(self, client, address):
         """Accept the new client and send confirmation data."""
         # Log the connection.
@@ -53,12 +63,16 @@ class PieServer(Server):
         else:
             # Send a confirmation that this server is valid.
             client.Send({"action": "confirm_connect", "address": address})
+        # Start the game.
+        if len(self.channels) == self.max_clients:
+            for client in self.channels:
+                client.hand = self.deck.deal(5)
+                client.Send({"action": "start_game", "hand": [str(card) for card in client.hand]})
 
     def quit(self):
         """Shut down the server."""
         # Tell the clients that the server has shut down.
-        for client in self.channels:
-            client.Send({"action": "disconnected", "shutdown": True})
+        self.send_all({"action": "disconnected", "shutdown": True})
         # Pump the quit messages to the clients.
         self.Pump()
         # Log the server shutting down.

@@ -2,5 +2,5 @@
   "screen_resolution": [800, 600],
   "default_host": "127.0.0.1",
   "default_port": 5071,
-  "public_server": true
+  "public_server": false
 }

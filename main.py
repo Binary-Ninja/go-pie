@@ -61,6 +61,8 @@ class Main:
         # Handle top level events.
         for event in events:
             if event.type == pg.QUIT:
+                # Safely quit the current scene.
+                self.scene.quit()
                 # The window has been closed.
                 self.terminate()
             elif event.type == pg.VIDEORESIZE:

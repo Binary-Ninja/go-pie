@@ -5,6 +5,7 @@ from podsixnet2.Connection import connection, ConnectionListener
 
 # Local library imports.
 from config import *
+import pydeck as pd
 
 
 class PieClient(ConnectionListener):
@@ -17,6 +18,8 @@ class PieClient(ConnectionListener):
         self.Connect(address)
         # The client address is unknown until sent by the server.
         self.address = None
+        # The player's hand.
+        self.hand = pd.Stack()
 
     def get_address(self):
         """Returns the client address as a string "host:port".
@@ -39,7 +42,7 @@ class PieClient(ConnectionListener):
         """This method is called when the server is full."""
         print("[Client] Server is full.")
         # Update client status.
-        self.scene.update_client_status("Server is full.")
+        self.scene.update_client_status("Client: Server full")
         # Quit client.
         self.quit()
 
@@ -49,7 +52,13 @@ class PieClient(ConnectionListener):
         self.address = data['address']
         print(f"[Client] Confirmed address {self.get_address()}")
         # Update client status.
-        self.scene.update_client_status(f"Connected: {self.get_address()}")
+        self.scene.update_client_status("Client: Waiting for players")
+
+    def Network_start_game(self, data):
+        """Receive the player's hand from the server."""
+        self.hand = pd.Stack(data["hand"])
+        # Update client status.
+        self.scene.update_client_status("Client: Not your turn")
 
     def Network_error(self, data):
         """Log the socket errors that occur."""
@@ -61,12 +70,12 @@ class PieClient(ConnectionListener):
             # The disconnect was deliberate.
             print("[Client] Server shut down.")
             # Update client status.
-            self.scene.update_client_status("Server shut down.")
+            self.scene.update_client_status("Client: Server shut down")
         else:
             # The disconnect was not planned.
             print(f"[Client] Disconnected from the server.")
             # Update client status.
-            self.scene.update_client_status("Disconnected from server.")
+            self.scene.update_client_status("Client: Disconnected from server")
         # Quit client.
         self.quit()
 
