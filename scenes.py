@@ -11,7 +11,7 @@ try:
     from pyngrok import ngrok
 except ImportError:
     ngrok = None
-    print("ngrok not found. Public server creation unavailable.")
+    print("WARNING: Public server creation unavailable.")
 
 # Local library imports.
 from config import *
@@ -333,10 +333,13 @@ class GameScene(BaseScene):
             self.server = PieServer((DEFAULT_HOST, DEFAULT_PORT), players)
             # Make the server public.
             self.tunnel = None
-            if ngrok:
-                self.tunnel = ngrok.connect(DEFAULT_PORT, "tcp")
-                print("[Server] ngrok tunnel online: "
-                      f"{self.tunnel.public_url} -> {self.tunnel.config['addr']}")
+            if public:
+                if ngrok:
+                    self.tunnel = ngrok.connect(DEFAULT_PORT, "tcp")
+                    print("[Server] ngrok tunnel online: "
+                          f"{self.tunnel.public_url} -> {self.tunnel.config['addr']}")
+                else:
+                    print("WARNING: Defaulting to private server.")
         # Create the client.
         if join_address is None:
             address = (DEFAULT_HOST, DEFAULT_PORT)
