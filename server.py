@@ -31,7 +31,7 @@ class PieServer(Server):
         self.address = address
         print(f"[Server] Server started on {self.get_address()}")
         # The number of players to wait for.
-        self.number_of_players = players
+        self.max_clients = players
 
     def get_address(self):
         """Returns the server address as a string "host:port"."""
@@ -47,8 +47,12 @@ class PieServer(Server):
         """Accept the new client and send confirmation data."""
         # Log the connection.
         print(f"[Server] New connection from {client.get_address()}")
-        # Send a confirmation that this server is valid.
-        client.Send({"action": "confirm_connect", "address": address})
+        # Only accept a certain number of clients.
+        if len(self.channels) > self.max_clients:
+            client.Send({"action": "server_full"})
+        else:
+            # Send a confirmation that this server is valid.
+            client.Send({"action": "confirm_connect", "address": address})
 
     def quit(self):
         """Shut down the server."""

@@ -337,7 +337,7 @@ class GameScene(BaseScene):
                 if ngrok:
                     self.tunnel = ngrok.connect(DEFAULT_PORT, "tcp")
                     print("[Server] ngrok tunnel online: "
-                          f"{self.tunnel.public_url} -> {self.tunnel.config['addr']}")
+                          f"{self.tunnel.public_url} -> {self.server.get_address()}")
                 else:
                     print("WARNING: Defaulting to private server.")
         # Create the client.
@@ -346,7 +346,33 @@ class GameScene(BaseScene):
         else:
             address = join_address.rsplit(':')
             address = address[0], int(address[1])
-        self.client = PieClient(address)
+        self.client = PieClient(self, address)
+        # Create the widgets.
+        text = "Not Hosting"
+        if self.server:
+            if public:
+                text = f"{self.tunnel.public_url.removeprefix('tcp://')}"
+            else:
+                text = f"{self.server.get_address()}"
+        self.address_text = Widget(DEFAULT_FONT.render(f"Server: {text}", True, BLACK, GRAY))
+        # Create the client status box.
+        self.client_status = Widget(DEFAULT_FONT.render("Server not found.", True, BLACK, GRAY))
+        # Position the widgets.
+        self.position_widgets()
+
+    def position_widgets(self):
+        """Place the widgets in their proper place on screen."""
+        self.address_text.rect.midtop = self.screen_rect.midtop
+        self.client_status.rect.center = self.screen_rect.center
+
+    def update_client_status(self, status):
+        """Called from the PieClient on certain Network events."""
+        self.client_status = Widget(DEFAULT_FONT.render(status, True, BLACK, GRAY))
+        self.client_status.rect.center = self.screen_rect.center
+
+    def update_screen_size(self, screen_rect):
+        self.screen_rect = screen_rect
+        self.position_widgets()
 
     def pump(self):
         if self.server:
@@ -368,5 +394,6 @@ class GameScene(BaseScene):
                             ngrok.disconnect(self.tunnel.public_url)
                             print("[Server] ngrok tunnel offline.")
 
-    def update_screen_size(self, screen_rect):
-        self.screen_rect = screen_rect
+    def draw(self, screen):
+        self.address_text.draw(screen)
+        self.client_status.draw(screen)
