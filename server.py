@@ -23,6 +23,7 @@ class ClientChannel(Channel):
         """Will be called upon client disconnection."""
         print(f"[Server] Client disconnected {self.get_address()}")
         # Remove self from the server's client list if not a player.
+        # Removing player clients will cause problems.
         if self not in self._server.players:
             self._server.channels.remove(self)
 
