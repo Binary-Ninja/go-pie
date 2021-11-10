@@ -22,8 +22,9 @@ class ClientChannel(Channel):
     def Close(self):
         """Will be called upon client disconnection."""
         print(f"[Server] Client disconnected {self.get_address()}")
-        # Remove self from the server's client list.
-        self._server.channels.remove(self)
+        # Remove self from the server's client list if not a player.
+        if self not in self._server.players:
+            self._server.channels.remove(self)
 
 
 class PieServer(Server):
@@ -36,6 +37,8 @@ class PieServer(Server):
         print(f"[Server] Server started on {self.get_address()}")
         # The number of players to wait for.
         self.max_clients = players
+        # The list of playing clients.
+        self.players = []
         # The deck of the game.
         self.deck = pd.new_deck(shuffle=True)
         # Whether the game is playing.
@@ -67,14 +70,16 @@ class PieServer(Server):
             client.Send({"action": "confirm_connect", "address": address})
         # Start the game.
         if len(self.channels) == self.max_clients:
+            # Start playing the game.
             self.playing = True
+            self.players = list(self.channels)
             # Deal hands and send out the start data.
             # Does not deal with tricks in starting hands.
-            for client in self.channels:
-                client.hand = self.deck.deal(6)
-                client.Send({"action": "start_game",
-                             "hand": [str(card) for card in client.hand],
-                             "id": self.channels.index(client),
+            for player in self.players:
+                player.hand = self.deck.deal(6)
+                player.Send({"action": "start_game",
+                             "hand": [str(card) for card in player.hand],
+                             "id": self.players.index(player),
                              "stats": [(6, 0) * self.max_clients],  # # of cards, # of tricks
                              })
 
