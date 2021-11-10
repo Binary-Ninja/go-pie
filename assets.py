@@ -26,6 +26,11 @@ BLACK = (0, 0, 0)
 GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
 
+
+# Card image.
+def make_card_image(card):
+    rank, suit = card[0], card[1]
+
 # The valid characters for the client address box.
 # A dictionary with keys of pygame event codes.
 # The tuples represent without and with shift, respectively.

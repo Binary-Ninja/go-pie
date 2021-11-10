@@ -359,7 +359,7 @@ class GameScene(BaseScene):
                 text = f"{self.server.get_address()}"
         self.address_text = Widget(DEFAULT_FONT.render(f"Server: {text}", True, BLACK, GRAY))
         # Create the client status box.
-        self.client_status = Widget(DEFAULT_FONT.render("Client: No server", True, BLACK, GRAY))
+        self.client_status = Widget(DEFAULT_FONT.render("No server", True, BLACK, GRAY))
         # Position the widgets.
         self.position_widgets()
 

@@ -38,6 +38,8 @@ class PieServer(Server):
         self.max_clients = players
         # The deck of the game.
         self.deck = pd.new_deck(shuffle=True)
+        # Whether the game is playing.
+        self.playing = False
 
     def get_address(self):
         """Returns the server address as a string "host:port"."""
@@ -65,9 +67,16 @@ class PieServer(Server):
             client.Send({"action": "confirm_connect", "address": address})
         # Start the game.
         if len(self.channels) == self.max_clients:
+            self.playing = True
+            # Deal hands and send out the start data.
+            # Does not deal with tricks in starting hands.
             for client in self.channels:
-                client.hand = self.deck.deal(5)
-                client.Send({"action": "start_game", "hand": [str(card) for card in client.hand]})
+                client.hand = self.deck.deal(6)
+                client.Send({"action": "start_game",
+                             "hand": [str(card) for card in client.hand],
+                             "id": self.channels.index(client),
+                             "stats": [(6, 0) * self.max_clients],  # # of cards, # of tricks
+                             })
 
     def quit(self):
         """Shut down the server."""
