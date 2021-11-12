@@ -11,6 +11,8 @@ __all__ = [
     "BLACK",
     "WHITE",
     "GRAY",
+    # Images.
+    "make_player_button",
     # Misc.
     "VALID_CHARS",
 ]
@@ -25,6 +27,44 @@ DEFAULT_FONT = pg.font.Font(None, 20)
 BLACK = (0, 0, 0)
 GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
+
+
+# The function to make a player stat button.
+def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
+    """Returns a Surface for the player stat button.
+
+    player_id: int; the numerical player id
+
+    num_cards: int; number of cards in the player's hand
+
+    tricks: list[str]; a list of strings representing ranks
+    """
+    # Create the line images.
+    line_1 = DEFAULT_FONT.render(f"Player {player_id}", True, BLACK, GRAY)
+    line_2 = DEFAULT_FONT.render(f"Cards: {num_cards}", True, BLACK, GRAY)
+    line_3 = DEFAULT_FONT.render("Tricks: " + ", ".join(tricks), True, BLACK, GRAY)
+    # Get the width of the image.
+    width = max(line_1.get_width(), line_2.get_width(), line_3.get_width())
+    # Create the final image.
+    surface = pg.Surface((width, DEFAULT_FONT.get_height() * 3)).convert()
+    surface.fill(GRAY)
+    # Blit the lines onto it.
+    surface.blit(line_1, (0, 0))
+    surface.blit(line_2, (0, DEFAULT_FONT.get_height()))
+    surface.blit(line_2, (0, DEFAULT_FONT.get_height() * 2))
+    # Return the button image.
+    return surface
+
+
+# The function to make a card image.
+def make_card_image(rank):
+    """Returns a Surface for the card image of a given rank."""
+    surface = pg.Surface((50, 100)).convert()
+    surface.fill(GRAY)
+    text = DEFAULT_FONT.render(f"{rank}", True, BLACK, GRAY)
+    surface.blit(text, (0, 0))
+    return surface
+
 
 # The valid characters for the client address box.
 # A dictionary with keys of pygame event codes.

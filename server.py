@@ -13,7 +13,10 @@ class ClientChannel(Channel):
     """The server representation of a client."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Initialize the player info.
         self.hand = pd.Stack()
+        # The tricks taken as a list of ranks.
+        self.tricks = []
 
     def get_address(self):
         """Returns the client address as a string "host:port"."""
@@ -78,10 +81,14 @@ class PieServer(Server):
             # Does not deal with tricks in starting hands.
             for player in self.players:
                 player.hand = self.deck.deal(6)
+            # Calculate the game stats.
+            stats = [(len(player.hand), player.tricks) for player in self.players]
+            # Send the start game information to all players.
+            for player in self.players:
                 player.Send({"action": "start_game",
-                             "hand": [str(card) for card in player.hand],
                              "id": self.players.index(player),
-                             "stats": [(6, 0) * self.max_clients],  # # of cards, # of tricks
+                             "hand": [str(card) for card in player.hand],
+                             "stats": stats,
                              })
 
     def quit(self):

@@ -62,8 +62,8 @@ class PieClient(ConnectionListener):
 
     def Network_start_game(self, data):
         """Receive the player's hand from the server."""
-        self.hand = pd.Stack(data["hand"])
         self.id = data["id"]
+        self.hand = pd.Stack(data["hand"])
         self.stats = data["stats"]
         # Update client status.
         self.scene.update_client_status("Not your turn")
