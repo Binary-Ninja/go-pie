@@ -350,6 +350,7 @@ class GameScene(BaseScene):
             address = join_address.rsplit(':')
             address = address[0], int(address[1])
         self.client = PieClient(self, address)
+
         # Create the widgets.
         text = "Not hosting"
         if self.server:
@@ -360,6 +361,11 @@ class GameScene(BaseScene):
         self.address_text = Widget(DEFAULT_FONT.render(f"Server: {text}", True, BLACK, GRAY))
         # Create the client status box.
         self.client_status = Widget(DEFAULT_FONT.render("No server", True, BLACK, GRAY))
+        # The player button list.
+        self.player_buttons = []
+        # The card list.
+        self.card_widgets = []
+
         # Position the widgets.
         self.position_widgets()
 
@@ -369,9 +375,35 @@ class GameScene(BaseScene):
         self.client_status.rect.midtop = self.address_text.rect.midbottom
 
     def update_client_status(self, status):
-        """Called from the PieClient on certain Network events."""
+        """Called from the PieClient on certain Network events.
+        Updates the client status bar."""
         self.client_status = Widget(DEFAULT_FONT.render(status, True, BLACK, GRAY))
         self.client_status.rect.midtop = self.address_text.rect.midbottom
+
+    def update_stats(self, stats):
+        """Called from the PieClient on certain Network events.
+        Updates the player buttons on the screen."""
+        # Clear the current stats.
+        self.player_buttons = []
+        # Create the new stats.
+        for player_id, stat in enumerate(stats):
+            w = Widget(make_player_button(player_id, stat[0], stat[1]))
+            w.rect.centery = self.screen_rect.centery
+            w.rect.left = player_id * 100
+            self.player_buttons.append(w)
+
+    def update_cards(self, cards):
+        """Called from the PieClient on certain Network events.
+        Given a list of ranks, updates the player's hand.
+        There must be at least one player button or this method will crash."""
+        # Clear the current hand.
+        self.card_widgets = []
+        # Create the new card widgets.
+        for index, card in enumerate(cards):
+            w = Widget(make_card_image(card))
+            w.rect.top = self.player_buttons[0].rect.bottom + 20
+            w.rect.left = index * 60
+            self.card_widgets.append(w)
 
     def update_screen_size(self, screen_rect):
         self.screen_rect = screen_rect
@@ -392,6 +424,10 @@ class GameScene(BaseScene):
     def draw(self, screen):
         self.address_text.draw(screen)
         self.client_status.draw(screen)
+        for button in self.player_buttons:
+            button.draw(screen)
+        for card in self.card_widgets:
+            card.draw(screen)
 
     def quit(self):
         # Quit the client.

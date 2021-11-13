@@ -13,6 +13,7 @@ __all__ = [
     "GRAY",
     # Images.
     "make_player_button",
+    "make_card_image",
     # Misc.
     "VALID_CHARS",
 ]
@@ -51,7 +52,7 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
     # Blit the lines onto it.
     surface.blit(line_1, (0, 0))
     surface.blit(line_2, (0, DEFAULT_FONT.get_height()))
-    surface.blit(line_2, (0, DEFAULT_FONT.get_height() * 2))
+    surface.blit(line_3, (0, DEFAULT_FONT.get_height() * 2))
     # Return the button image.
     return surface
 
@@ -59,7 +60,7 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
 # The function to make a card image.
 def make_card_image(rank):
     """Returns a Surface for the card image of a given rank."""
-    surface = pg.Surface((50, 100)).convert()
+    surface = pg.Surface((50, 80)).convert()
     surface.fill(GRAY)
     text = DEFAULT_FONT.render(f"{rank}", True, BLACK, GRAY)
     surface.blit(text, (0, 0))

@@ -67,6 +67,10 @@ class PieClient(ConnectionListener):
         self.stats = data["stats"]
         # Update client status.
         self.scene.update_client_status("Not your turn")
+        # Update client stats.
+        self.scene.update_stats(self.stats)
+        # Update client cards.
+        self.scene.update_cards([card.rank for card in self.hand])
 
     def Network_error(self, data):
         """Log the socket errors that occur."""
