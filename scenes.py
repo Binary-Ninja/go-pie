@@ -32,13 +32,16 @@ class NextScene(Enum):
 
 class Widget:
     """A basic widget that holds an image and a rectangle."""
-    def __init__(self, image: pg.Surface):
+    def __init__(self, image: pg.Surface, data=None):
         self.image = image
         self.rect = self.image.get_rect()
+        # Optional data.
+        self.data = data
 
     def draw(self, screen: pg.Surface):
-        """Draws the widget on the given surface."""
-        screen.blit(self.image, self.rect)
+        """Draws the widget on the given surface.
+        Returns the area affected."""
+        return screen.blit(self.image, self.rect)
 
 
 class BaseScene:
@@ -111,7 +114,7 @@ class StartScene(BaseScene):
                     self.next_scene = NextScene.HOST
                 elif event.key == pg.K_j:
                     self.next_scene = NextScene.JOIN
-            elif event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.host_button.rect.collidepoint(event.pos):
@@ -200,7 +203,7 @@ class HostScene(BaseScene):
                                    "players": self.number_of_players}
                 elif event.key == pg.K_ESCAPE:
                     self.next_scene = NextScene.START
-            elif event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.start_button.rect.collidepoint(event.pos):
@@ -294,7 +297,7 @@ class JoinScene(BaseScene):
                     # Add one character to the text, taking into account the shift key.
                     self.text += VALID_CHARS[event.key][bool(event.mod & pg.KMOD_SHIFT)]
                     self.update_text_box()
-            elif event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     # Check for button clicks.
                     if self.start_button.rect.collidepoint(event.pos):
@@ -351,6 +354,12 @@ class GameScene(BaseScene):
             address = address[0], int(address[1])
         self.client = PieClient(self, address)
 
+        # The scene variables.
+        # Whether or not it is this player's turn.
+        self.turn = False
+        # The current card selected.
+        self.card = None
+
         # Create the widgets.
         text = "Not hosting"
         if self.server:
@@ -387,10 +396,11 @@ class GameScene(BaseScene):
         self.player_buttons = []
         # Create the new stats.
         for player_id, stat in enumerate(stats):
-            w = Widget(make_player_button(player_id, stat[0], stat[1]))
-            w.rect.centery = self.screen_rect.centery
-            w.rect.left = player_id * 100
-            self.player_buttons.append(w)
+            if player_id != self.client.player_id:
+                w = Widget(make_player_button(player_id, stat[0], stat[1]), player_id)
+                w.rect.centery = self.screen_rect.centery
+                w.rect.left = player_id * 100
+                self.player_buttons.append(w)
 
     def update_cards(self, cards):
         """Called from the PieClient on certain Network events.
@@ -400,10 +410,14 @@ class GameScene(BaseScene):
         self.card_widgets = []
         # Create the new card widgets.
         for index, card in enumerate(cards):
-            w = Widget(make_card_image(card))
+            w = Widget(make_card_image(card), card)
             w.rect.top = self.player_buttons[0].rect.bottom + 20
             w.rect.left = index * 60
             self.card_widgets.append(w)
+
+    def update_turn(self):
+        # It is now this player's turn.
+        self.turn = True
 
     def update_screen_size(self, screen_rect):
         self.screen_rect = screen_rect
@@ -420,6 +434,28 @@ class GameScene(BaseScene):
                 if event.key == pg.K_ESCAPE:
                     self.next_scene = NextScene.START
                     self.quit()
+            elif event.type == pg.MOUSEBUTTONUP:
+                # Only allow clicking buttons if it is your turn.
+                if self.turn:
+                    # Get the card selected.
+                    for card in self.card_widgets:
+                        if card.rect.collidepoint(event.pos):
+                            self.card = card.data
+                            self.update_client_status(f"Your turn: {self.card}s selected")
+                            continue
+                    # Get the player asked.
+                    for player in self.player_buttons:
+                        if player.rect.collidepoint(event.pos):
+                            # Only send data if a card has been picked.
+                            if self.card is not None:
+                                self.client.Send({"action": "ask",
+                                                  "player": player.data,
+                                                  "rank": self.card})
+                                # Reset the turn.
+                                self.turn = False
+                                self.card = None
+                                self.update_client_status("Not your turn")
+                            continue
 
     def draw(self, screen):
         self.address_text.draw(screen)
@@ -427,7 +463,10 @@ class GameScene(BaseScene):
         for button in self.player_buttons:
             button.draw(screen)
         for card in self.card_widgets:
-            card.draw(screen)
+            rect = card.draw(screen)
+            # Draw a highlight for selected ranks.
+            if self.card == card.data:
+                pg.draw.rect(screen, CYAN, rect, 2)
 
     def quit(self):
         # Quit the client.

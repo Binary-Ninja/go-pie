@@ -22,6 +22,10 @@ class ClientChannel(Channel):
         """Returns the client address as a string "host:port"."""
         return f"{self.addr[0]}:{self.addr[1]}"
 
+    def Network_ask(self, data):
+        """Called when a player asks another for a card."""
+        print(f"[Server] {self.get_address()} asked player {data['player']} for {data['rank']}s.")
+
     def Close(self):
         """Will be called upon client disconnection."""
         print(f"[Server] Client disconnected {self.get_address()}")
@@ -90,6 +94,8 @@ class PieServer(Server):
                              "hand": [str(card) for card in player.hand],
                              "stats": stats,
                              })
+            # Tell the first player it's their turn.
+            self.players[0].Send({"action": "turn"})
 
     def quit(self):
         """Shut down the server."""

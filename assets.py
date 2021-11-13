@@ -11,6 +11,7 @@ __all__ = [
     "BLACK",
     "WHITE",
     "GRAY",
+    "CYAN",
     # Images.
     "make_player_button",
     "make_card_image",
@@ -28,6 +29,7 @@ DEFAULT_FONT = pg.font.Font(None, 20)
 BLACK = (0, 0, 0)
 GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
+CYAN = (0, 255, 255)
 
 
 # The function to make a player stat button.
