@@ -64,9 +64,20 @@ class PieClient(ConnectionListener):
         """Receive the player's hand from the server."""
         self.player_id = data["id"]
         self.hand = pd.Stack(data["hand"])
+        self.hand.sort()
         self.stats = data["stats"]
         # Update client status.
         self.scene.update_client_status("Not your turn")
+        # Update client stats.
+        self.scene.update_stats(self.stats)
+        # Update client cards.
+        self.scene.update_cards([card.rank for card in self.hand])
+
+    def Network_hand_and_stats(self, data):
+        """Refreshes the player's hand and stats."""
+        self.hand = pd.Stack(data["hand"])
+        self.hand.sort()
+        self.stats = data["stats"]
         # Update client stats.
         self.scene.update_stats(self.stats)
         # Update client cards.
@@ -77,6 +88,10 @@ class PieClient(ConnectionListener):
         # Update scene.
         self.scene.update_client_status("Your turn: No card selected")
         self.scene.update_turn()
+
+    def Network_game_over(self, data):
+        """The game has ended."""
+        self.scene.update_client_status("Game Over")
 
     def Network_error(self, data):
         """Log the socket errors that occur."""
@@ -100,7 +115,7 @@ class PieClient(ConnectionListener):
     def quit(self):
         """Quit the client and exit the server.
         If the connection has been closed, this has no effect."""
-        if connection.isConnected:
+        if connection.connected:
             print("[Client] Client shut down.")
             # Close connection to the server.
             connection.close()

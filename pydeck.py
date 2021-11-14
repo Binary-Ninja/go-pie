@@ -394,7 +394,7 @@ class Stack:
             self.cards.remove(card)
 
     def random_card(self, remove=False, num=1):
-        card = random.sample(self.cards, 1)[0]
+        card = random.sample(self.cards, num)[0]
         if remove:
             del self.cards[self.cards.index(card)]
         return card
