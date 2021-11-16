@@ -31,8 +31,8 @@ pg.init()
 # The default font.
 try:
     DEFAULT_FONT = pg.font.Font(Path() / "Kenney Future.ttf", 14)
-except FileNotFoundError:
-    print("Couldn't load font.")
+except (pg.error, FileNotFoundError) as error:
+    print(f"Couldn't load font: {error}")
     DEFAULT_FONT = pg.font.Font(None, 20)
 
 # Colors.
