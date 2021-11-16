@@ -30,7 +30,7 @@ pg.init()
 
 # The default font.
 try:
-    DEFAULT_FONT = pg.font.Font(Path() / "Kenney Future.ttf", 14)
+    DEFAULT_FONT = pg.font.Font(str(Path() / "Kenney Future.ttf"), 14)
 except (pg.error, FileNotFoundError) as error:
     print(f"Couldn't load font: {error}")
     DEFAULT_FONT = pg.font.Font(None, 20)
@@ -42,6 +42,9 @@ WHITE = (255, 255, 255)
 CYAN = (0, 255, 255)
 TAN = (253, 246, 227)
 DARK_TAN = (238, 232, 213)
+
+# The button image.
+BUTTON_IMG = pg.image.load(str(Path() / "img" / "button.png"))
 
 # The ranks, translated into card images.
 ranks_to_pie = {
@@ -65,7 +68,7 @@ ranks_to_pie = {
 card_images = {}
 for card_path in ranks_to_pie.values():
     try:
-        card_images[card_path] = pg.image.load(Path() / "img" / card_path)
+        card_images[card_path] = pg.image.load(str(Path() / "img" / card_path))
     except pg.error:
         print(f"Error loading image: {card_path}")
 
