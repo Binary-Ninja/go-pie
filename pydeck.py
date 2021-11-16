@@ -384,7 +384,7 @@ class Stack:
         self.cards.insert(index, cards)
 
     def remove(self, term):
-        for card in self.cards:
+        for card in self.cards[:]:
             if term in card or term == card:
                 self.cards.remove(card)
 

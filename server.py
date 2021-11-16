@@ -136,10 +136,12 @@ class PieServer(Server):
             # Remove the cards from the asked player's hand.
             player_asked.hand.remove(rank)
             self.update_empty(player_asked)
+            self.update_tricks(player_asked)
             # Add the cards to the asking player's hand.
             player_asking.hand.add_list(cards)
             self.update_tricks(player_asking)
             self.update_empty(player_asking)
+            self.update_tricks(player_asking)
             # Continue the turn.
             player_asking.Send({"action": "turn"})
         else:
@@ -150,9 +152,21 @@ class PieServer(Server):
                 player_asking.hand.add(card)
                 self.update_tricks(player_asking)
                 self.update_empty(player_asking)
+                self.update_tricks(player_asking)
 
                 if card.rank == rank:
                     print(f"[Server] Player {player_asking.player_id} gets a {rank}.")
+                    # Continue the turn.
+                    player_asking.Send({"action": "turn"})
+                    # Update the players.
+                    stats = [(len(player.hand), player.tricks) for player in self.players]
+                    for player in self.players:
+                        player.Send({"action": "hand_and_stats",
+                                     "hand": [str(card) for card in player.hand],
+                                     "stats": stats,
+                                     })
+                    # Leave the function early to avoid turn counter.
+                    return
             else:
                 print("[Server] The deck is empty.")
 
