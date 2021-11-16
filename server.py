@@ -140,6 +140,8 @@ class PieServer(Server):
             player_asking.hand.add_list(cards)
             self.update_tricks(player_asking)
             self.update_empty(player_asking)
+            # Continue the turn.
+            player_asking.Send({"action": "turn"})
         else:
             print(f"[Server] Player {player_asking.player_id} goes fish.")
             if not self.deck.is_empty():
@@ -154,6 +156,28 @@ class PieServer(Server):
             else:
                 print("[Server] The deck is empty.")
 
+            # Switch turns to the next player.
+            player = DummyPlayer
+            # Only send the turn signal to valid players.
+            # Only loop around a certain number of times.
+            for _ in range(self.max_clients):
+                if not player.connected or player.hand.is_empty():
+                    # Skip this player.
+                    self.turn += 1
+                    self.turn %= self.max_clients
+                    player = self.players[self.turn]
+                else:
+                    # Use this player.
+                    break
+
+            # Send the turn action or end the game.
+            if player is DummyPlayer:
+                # End the game.
+                self.send_all({"action": "game_over"})
+            else:
+                # Tell the next player to take their turn.
+                player.Send({"action": "turn"})
+
         # Update the players.
         stats = [(len(player.hand), player.tricks) for player in self.players]
         for player in self.players:
@@ -161,28 +185,6 @@ class PieServer(Server):
                          "hand": [str(card) for card in player.hand],
                          "stats": stats,
                          })
-
-        # Switch turns to the next player.
-        player = DummyPlayer
-        # Only send the turn signal to valid players.
-        # Only loop around a certain number of times.
-        for _ in range(self.max_clients):
-            if not player.connected or player.hand.is_empty():
-                # Skip this player.
-                self.turn += 1
-                self.turn %= self.max_clients
-                player = self.players[self.turn]
-            else:
-                # Use this player.
-                break
-
-        # Send the turn action or end the game.
-        if player is DummyPlayer:
-            # End the game.
-            self.send_all({"action": "game_over"})
-        else:
-            # Tell the next player to take their turn.
-            player.Send({"action": "turn"})
 
     def quit(self):
         """Shut down the server."""

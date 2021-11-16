@@ -418,6 +418,7 @@ class GameScene(BaseScene):
     def update_turn(self):
         # It is now this player's turn.
         self.turn = True
+        self.card = None
 
     def update_screen_size(self, screen_rect):
         self.screen_rect = screen_rect
