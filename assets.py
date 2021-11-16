@@ -86,18 +86,17 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
     # Convert ranks to card image names.
     tricks = [ranks_to_pie[rank].removesuffix(".png") for rank in tricks]
     # Create the line images.
-    line_1 = DEFAULT_FONT.render(f"Player {player_id}", True, BLACK, GRAY)
-    line_2 = DEFAULT_FONT.render(f"Cards: {num_cards}", True, BLACK, GRAY)
-    line_3 = DEFAULT_FONT.render("Tricks: " + ", ".join(tricks), True, BLACK, GRAY)
+    line_1 = DEFAULT_FONT.render(f"Player {player_id}", True, BLACK)
+    line_2 = DEFAULT_FONT.render(f"Cards: {num_cards}", True, BLACK)
+    line_3 = DEFAULT_FONT.render("Tricks: " + ", ".join(tricks), True, BLACK)
     # Get the width of the image.
     width = max(line_1.get_width(), line_2.get_width(), line_3.get_width())
     # Create the final image.
-    surface = pg.Surface((width, DEFAULT_FONT.get_height() * 3)).convert()
-    surface.fill(GRAY)
+    surface = pg.transform.scale(BUTTON_IMG, (width + 10, DEFAULT_FONT.get_height() * 3 + 10)).convert()
     # Blit the lines onto it.
-    surface.blit(line_1, (0, 0))
-    surface.blit(line_2, (0, DEFAULT_FONT.get_height()))
-    surface.blit(line_3, (0, DEFAULT_FONT.get_height() * 2))
+    surface.blit(line_1, (5, 5))
+    surface.blit(line_2, (5, DEFAULT_FONT.get_height() + 5))
+    surface.blit(line_3, (5, DEFAULT_FONT.get_height() * 2 + 5))
     # Return the button image.
     return surface
 

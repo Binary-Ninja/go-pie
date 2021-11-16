@@ -513,6 +513,14 @@ class GameScene(BaseScene):
                             continue
 
     def draw(self, screen):
+        # Display the exit control right below the FPS.
+        screen.blit(DEFAULT_FONT.render("ESC to quit.",
+                                        True, BLACK), (0, DEFAULT_FONT.get_height()))
+        # Display the card scale controls at top right.
+        screen.blit(DEFAULT_FONT.render("UP/DOWN to scale cards.", True, BLACK),
+                    (self.screen_rect.right - DEFAULT_FONT.size("UP/DOWN to scale cards.")[0], 0))
+
+        # Display widgets.
         self.address_text.draw(screen)
         self.client_status.draw(screen)
         for button in self.player_buttons:
