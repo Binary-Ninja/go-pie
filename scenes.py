@@ -436,7 +436,7 @@ class GameScene(BaseScene):
         for player_id, stat in enumerate(stats):
             if player_id != self.client.player_id:
                 w = Widget(make_player_button(player_id, stat[0], stat[1]), player_id)
-                w.rect.centery = self.screen_rect.centery
+                w.rect.top = self.client_status.rect.bottom + 20
                 w.rect.left = player_id * 100
                 self.player_buttons.append(w)
 
