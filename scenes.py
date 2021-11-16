@@ -5,6 +5,7 @@ from enum import Enum, auto
 
 # Third party library imports.
 import pygame as pg
+from pygame.math import Vector2
 
 # Import ngrok if available.
 try:
@@ -19,6 +20,41 @@ from assets import *
 
 from server import PieServer
 from client import PieClient
+
+
+class Particle(pg.sprite.Sprite):
+    def __init__(self, pos, size, angle=0, pos_vel=0, angle_vel=0):
+        super().__init__()
+        # Whether the particle is dead or not.
+        self.dead = False
+        # Store the particle state.
+        self.pos = Vector2(pos)
+        self.angle = angle
+        self.pos_vel = Vector2(pos_vel)
+        self.angle_vel = angle_vel
+        # Create the base image.
+        self.base_image = pg.Surface(size).convert()
+        self.base_image.fill(DARK_TAN)
+        self.base_image.set_colorkey(BLACK)
+        # Create the main image.
+        self.image = pg.transform.rotate(self.base_image, self.angle)
+        # Create the rect.
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+    def update(self, dt):
+        # Update the particle state.
+        # Convert units per tick to units per second.
+        self.pos += self.pos_vel * dt / 1000
+        self.angle += self.angle_vel * dt / 1000
+        # Wrap angle around unit circle.
+        self.angle %= 360
+
+        # Create a new image.
+        self.image = pg.transform.rotate(self.base_image, int(self.angle))
+        # Reposition the drawing rectangle.
+        self.rect = self.image.get_rect()
+        self.rect.center = int(self.pos.x), int(self.pos.y)
 
 
 class NextScene(Enum):
@@ -359,6 +395,8 @@ class GameScene(BaseScene):
         self.turn = False
         # The current card selected.
         self.card = None
+        # The current scale of the cards.
+        self.card_scale = CARD_SCALE
 
         # Create the widgets.
         text = "Not hosting"
@@ -410,10 +448,15 @@ class GameScene(BaseScene):
         self.card_widgets = []
         # Create the new card widgets.
         for index, card in enumerate(cards):
-            w = Widget(make_card_image(card), card)
+            w = Widget(self.scale_card(card_images[ranks_to_pie[card]]), card)
             w.rect.top = self.player_buttons[0].rect.bottom + 20
-            w.rect.left = index * 60
+            w.rect.left = index * w.rect.centerx
             self.card_widgets.append(w)
+
+    def scale_card(self, image: pg.Surface) -> pg.Surface:
+        """Scales a given card surface by self.card_scale."""
+        w, h = int(image.get_width() * self.card_scale), int(image.get_height() * self.card_scale)
+        return pg.transform.scale(image, (w, h))
 
     def update_turn(self):
         # It is now this player's turn.
@@ -435,6 +478,16 @@ class GameScene(BaseScene):
                 if event.key == pg.K_ESCAPE:
                     self.next_scene = NextScene.START
                     self.quit()
+                elif event.key == pg.K_UP:
+                    self.card_scale += 0.01
+                    self.card_scale = min(self.card_scale, 0.2)
+                    if self.card_widgets:
+                        self.update_cards([card.data for card in self.card_widgets])
+                elif event.key == pg.K_DOWN:
+                    self.card_scale -= 0.01
+                    self.card_scale = max(self.card_scale, 0.02)
+                    if self.card_widgets:
+                        self.update_cards([card.data for card in self.card_widgets])
             elif event.type == pg.MOUSEBUTTONUP:
                 # Only allow clicking buttons if it is your turn.
                 if self.turn:
@@ -442,7 +495,8 @@ class GameScene(BaseScene):
                     for card in self.card_widgets:
                         if card.rect.collidepoint(event.pos):
                             self.card = card.data
-                            self.update_client_status(f"Your turn: {self.card}s selected")
+                            text = ranks_to_pie[self.card].removesuffix(".png")
+                            self.update_client_status(f"Your turn: {text} selected")
                             continue
                     # Get the player asked.
                     for player in self.player_buttons:

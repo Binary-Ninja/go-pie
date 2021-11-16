@@ -27,6 +27,10 @@ pyngrok should be able to find your token. This will allow your public servers t
 A file named `config.json` holds the default settings.
 
 - `"screen_resolution"` - The starting resolution of the display. The display can be resized.
+- `"card_scale"` - The scaling of the card images. Can be adjusted per client.
 - `"default_host"` - The default host for servers and clients.
 - `"default_port"` - The default port for servers and clients.
 - `"public_server"` - A boolean that specifies whether to use `pyngrok` to open the server publicly.
+
+## Key Commands
+Use the UP and DOWN arrow keys while playing to scale your cards UP and DOWN.

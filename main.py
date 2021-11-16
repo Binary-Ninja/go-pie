@@ -3,6 +3,7 @@
 
 # Standard library imports.
 import sys
+import random
 
 # Third party library imports.
 import pygame as pg
@@ -10,7 +11,7 @@ import pygame as pg
 # Local library imports.
 from config import *
 from assets import *
-from scenes import NextScene, StartScene, HostScene, JoinScene, GameScene
+from scenes import NextScene, StartScene, HostScene, JoinScene, GameScene, Particle
 
 
 class Main:
@@ -27,8 +28,31 @@ class Main:
         # The time that passed between the last two frames in milliseconds.
         self.dt = 0
 
+        # Convert the card images.
+        for card_rank, card_image in card_images.items():
+            card_images[card_rank] = card_image.convert()
+
         # Keep track of the current scene.
         self.scene = StartScene(self.screen_rect)
+        # Store the background particles.
+        self.particles = pg.sprite.Group()
+        # Create some particles.
+        for _ in range(10):
+            self.create_new_particle(bottom=False)
+
+    def create_new_particle(self, bottom=True):
+        if bottom:
+            bottom = self.screen_rect.bottom + 100
+        else:
+            bottom = random.randint(0, self.screen_rect.bottom)
+        pos = random.randint(0, self.screen_rect.right), bottom
+        size = (random.randint(50, 200),) * 2
+        angle = random.randint(0, 359)
+        pos_vel = (0, -random.randint(50, 100))
+        angle_vel = random.randint(45, 180)
+        if random.random() > 0.5:
+            angle_vel *= -1
+        self.particles.add(Particle(pos, size, angle, pos_vel, angle_vel))
 
     def terminate(self):
         """Close the window and end the process."""
@@ -77,17 +101,30 @@ class Main:
 
     def update(self):
         """Update everything before drawing."""
+        # Update the particles.
+        for particle in self.particles:
+            particle.update(self.dt)
+            # Kill particles off screen.
+            if particle.rect.bottom < 0:
+                particle.kill()
+        # Add new particles.
+        while len(self.particles) < 10:
+            self.create_new_particle()
+
         # Update the current scene.
         self.scene.update(self.dt)
 
     def render_text(self, text):
         """Return rendered anti aliased text surface."""
-        return DEFAULT_FONT.render(text, True, BLACK, WHITE)
+        return DEFAULT_FONT.render(text, True, BLACK)
 
     def draw(self):
         """Draw everything to the screen."""
         # Draw the background.
-        self.screen.fill(WHITE)
+        self.screen.fill(TAN)
+
+        # Draw the background particles.
+        self.particles.draw(self.screen)
 
         # Draw the current scene.
         self.scene.draw(self.screen)

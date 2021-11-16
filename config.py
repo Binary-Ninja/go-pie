@@ -7,6 +7,7 @@ from pathlib import Path
 # Export the configuration variables.
 __all__ = [
     "DEFAULT_SCREEN_SIZE",
+    "CARD_SCALE",
     "DEFAULT_HOST",
     "DEFAULT_PORT",
     "PUBLIC_SERVER",
@@ -24,6 +25,8 @@ except FileNotFoundError:
 # Extract configuration data with default values.
 # The starting screen resolution.
 DEFAULT_SCREEN_SIZE = config_data.get("screen_resolution", (800, 600))
+# The scaling of the card images.
+CARD_SCALE = config_data.get("card_scale", 0.1)
 # The default host for servers and clients.
 DEFAULT_HOST = config_data.get("default_host", "127.0.0.1")
 # The default port for servers and clients.

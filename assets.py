@@ -1,5 +1,8 @@
 """Contains all the global assets."""
 
+# Standard library imports.
+from pathlib import Path
+
 # Third party library imports.
 import pygame as pg
 
@@ -12,10 +15,13 @@ __all__ = [
     "WHITE",
     "GRAY",
     "CYAN",
+    "TAN",
+    "DARK_TAN",
     # Images.
+    "card_images",
     "make_player_button",
-    "make_card_image",
     # Misc.
+    "ranks_to_pie",
     "VALID_CHARS",
 ]
 
@@ -23,13 +29,45 @@ __all__ = [
 pg.init()
 
 # The default font.
-DEFAULT_FONT = pg.font.Font(None, 20)
+try:
+    DEFAULT_FONT = pg.font.Font(Path() / "Kenney Future.ttf", 14)
+except pg.error:
+    print("Couldn't load font.")
+    DEFAULT_FONT = pg.font.Font(None, 20)
 
 # Colors.
 BLACK = (0, 0, 0)
 GRAY = (128, 128, 128)
 WHITE = (255, 255, 255)
 CYAN = (0, 255, 255)
+TAN = (253, 246, 227)
+DARK_TAN = (238, 232, 213)
+
+# The ranks, translated into card images.
+ranks_to_pie = {
+    "A": "Apple-Pie.png",
+    "2": "Cherry-Pie.png",
+    "3": "Chocolate-Pie.png",
+    "4": "Cutie-Pie.png",
+    "5": "Peach-Pie.png",
+    "6": "Pecan-Pie.png",
+    "7": "Pi-Pie.png",
+    "8": "Pie-Chart.png",
+    "9": "Pizza-Pie.png",
+    "T": "Pumpkin-Pie.png",
+    "J": "Python-Pie.png",
+    "Q": "Raspberry-Pi.png",
+    "K": "Banana-Cream-Pie.png",
+}
+
+
+# Load the card images.
+card_images = {}
+for card_path in ranks_to_pie.values():
+    try:
+        card_images[card_path] = pg.image.load(Path() / "img" / card_path)
+    except pg.error:
+        print(f"Error loading image: {card_path}")
 
 
 # The function to make a player stat button.
@@ -42,6 +80,8 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
 
     tricks: list[str]; a list of strings representing ranks
     """
+    # Convert ranks to card image names.
+    tricks = [ranks_to_pie[rank].removesuffix(".png") for rank in tricks]
     # Create the line images.
     line_1 = DEFAULT_FONT.render(f"Player {player_id}", True, BLACK, GRAY)
     line_2 = DEFAULT_FONT.render(f"Cards: {num_cards}", True, BLACK, GRAY)
@@ -56,16 +96,6 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
     surface.blit(line_2, (0, DEFAULT_FONT.get_height()))
     surface.blit(line_3, (0, DEFAULT_FONT.get_height() * 2))
     # Return the button image.
-    return surface
-
-
-# The function to make a card image.
-def make_card_image(rank):
-    """Returns a Surface for the card image of a given rank."""
-    surface = pg.Surface((50, 80)).convert()
-    surface.fill(GRAY)
-    text = DEFAULT_FONT.render(f"{rank}", True, BLACK, GRAY)
-    surface.blit(text, (0, 0))
     return surface
 
 
