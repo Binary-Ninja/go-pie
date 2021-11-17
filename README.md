@@ -33,4 +33,5 @@ A file named `config.json` holds the default settings.
 - `"public_server"` - A boolean that specifies whether to use `pyngrok` to open the server publicly.
 
 ## Key Commands
+Press ESC to exit the game.
 Use the UP and DOWN arrow keys while playing to scale your cards UP and DOWN.
