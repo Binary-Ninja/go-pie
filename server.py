@@ -128,12 +128,15 @@ class PieServer(Server):
 
     def player_ask(self, player_asking: ClientChannel, player_id: int, rank: str):
         """Player has asked another player for a specific rank."""
-        print(f"[Server] Player {player_asking.player_id} asked player {player_id} for {rank}s.")
+        self.send_all({"action": "chat",
+                       "chat": f"Player {player_asking.player_id} asked player "
+                               f"{player_id} for {rank}s."})
         # Do all the go fish logic.
         player_asked = self.players[player_id]
 
         if cards := player_asked.hand.get(rank):
-            print(f"[Server] Player {player_asking.player_id} gets {len(cards)} {rank}s.")
+            self.send_all({"action": "chat",
+                           "chat": f"Player {player_asking.player_id} gets {len(cards)} {rank}s."})
             # Remove the cards from the asked player's hand.
             player_asked.hand.remove(rank)
             self.update_empty(player_asked)
@@ -146,7 +149,7 @@ class PieServer(Server):
             # Continue the turn.
             player_asking.Send({"action": "turn"})
         else:
-            print(f"[Server] Player {player_asking.player_id} goes fish.")
+            self.send_all({"action": "chat", "chat": f"Player {player_asking.player_id} goes fish."})
             if not self.deck.is_empty():
                 # Add a card to the player's hand from the deck.
                 card = self.deck.deal(1)[0]
@@ -156,7 +159,8 @@ class PieServer(Server):
                 self.update_tricks(player_asking)
 
                 if card.rank == rank:
-                    print(f"[Server] Player {player_asking.player_id} gets a {rank}.")
+                    self.send_all({"action": "chat",
+                                   "chat": f"Player {player_asking.player_id} gets a {rank}."})
                     # Continue the turn.
                     player_asking.Send({"action": "turn"})
                     # Update the players.
@@ -170,7 +174,7 @@ class PieServer(Server):
                     # Leave the function early to avoid turn counter.
                     return
             else:
-                print("[Server] The deck is empty.")
+                self.send_all({"action": "chat", "chat": "The deck is empty."})
 
             # Switch turns to the next player.
             player = DummyPlayer

@@ -60,6 +60,10 @@ class PieClient(ConnectionListener):
         # Update client status.
         self.scene.update_client_status("Waiting for players")
 
+    def Network_chat(self, data):
+        """Simply prints chat data to stdout."""
+        print(f"[Server] {data['chat']}")
+
     def Network_start_game(self, data):
         """Receive the player's hand from the server."""
         self.player_id = data["id"]
