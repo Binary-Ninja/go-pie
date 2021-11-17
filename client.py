@@ -68,6 +68,8 @@ class PieClient(ConnectionListener):
         self.stats = data["stats"]
         # Update client status.
         self.scene.update_client_status("Not your turn")
+        # Update client deck status.
+        self.scene.update_deck_status(f"Deck: {data['deck']} cards")
         # Update client stats.
         self.scene.update_stats(self.stats)
         # Update client cards.
@@ -78,6 +80,8 @@ class PieClient(ConnectionListener):
         self.hand = pd.Stack(data["hand"])
         self.hand.sort()
         self.stats = data["stats"]
+        # Update client deck status.
+        self.scene.update_deck_status(f"Deck: {data['deck']} cards")
         # Update client stats.
         self.scene.update_stats(self.stats)
         # Update client cards.

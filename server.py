@@ -105,6 +105,7 @@ class PieServer(Server):
                              "id": self.players.index(player),
                              "hand": [str(card) for card in player.hand],
                              "stats": stats,
+                             "deck": len(self.deck),
                              })
             # Tell the first player it's their turn.
             self.players[self.turn].Send({"action": "turn"})
@@ -164,6 +165,7 @@ class PieServer(Server):
                         player.Send({"action": "hand_and_stats",
                                      "hand": [str(card) for card in player.hand],
                                      "stats": stats,
+                                     "deck": len(self.deck),
                                      })
                     # Leave the function early to avoid turn counter.
                     return
@@ -198,6 +200,7 @@ class PieServer(Server):
             player.Send({"action": "hand_and_stats",
                          "hand": [str(card) for card in player.hand],
                          "stats": stats,
+                         "deck": len(self.deck),
                          })
 
     def quit(self):

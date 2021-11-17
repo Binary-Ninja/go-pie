@@ -74,7 +74,7 @@ for card_path in ranks_to_pie.values():
 
 
 # The function to make a player stat button.
-def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
+def make_player_button(player_id: int, num_cards: int, tricks: list[str], self_id: int):
     """Returns a Surface for the player stat button.
 
     player_id: int; the numerical player id
@@ -82,17 +82,21 @@ def make_player_button(player_id: int, num_cards: int, tricks: list[str]):
     num_cards: int; number of cards in the player's hand
 
     tricks: list[str]; a list of strings representing ranks
+
+    self_id: int; the id of the client
     """
     # Convert ranks to card image names.
     tricks = [ranks_to_pie[rank].removesuffix(".png") for rank in tricks]
     # Create the line images.
-    line_1 = DEFAULT_FONT.render(f"Player {player_id}", True, BLACK)
+    line_1_text = "Player " + str(player_id) if player_id != self_id else "Your stats"
+    line_1 = DEFAULT_FONT.render(line_1_text, True, BLACK)
     line_2 = DEFAULT_FONT.render(f"Cards: {num_cards}", True, BLACK)
-    line_3 = DEFAULT_FONT.render("Tricks: " + ", ".join(tricks), True, BLACK)
+    line_3 = DEFAULT_FONT.render(f"Tricks: {len(tricks)}", True, BLACK)
     # Get the width of the image.
     width = max(line_1.get_width(), line_2.get_width(), line_3.get_width())
     # Create the final image.
-    surface = pg.transform.scale(BUTTON_IMG, (width + 10, DEFAULT_FONT.get_height() * 3 + 10)).convert()
+    surface = pg.transform.scale(BUTTON_IMG.convert_alpha(),
+                                 (width + 10, DEFAULT_FONT.get_height() * 3 + 10))
     # Blit the lines onto it.
     surface.blit(line_1, (5, 5))
     surface.blit(line_2, (5, DEFAULT_FONT.get_height() + 5))

@@ -408,6 +408,8 @@ class GameScene(BaseScene):
         self.address_text = Widget(DEFAULT_FONT.render(f"Server: {text}", True, BLACK, GRAY))
         # Create the client status box.
         self.client_status = Widget(DEFAULT_FONT.render("No server", True, BLACK, GRAY))
+        # How many cards the deck has.
+        self.deck_status = Widget(DEFAULT_FONT.render("Deck: No cards", True, BLACK, GRAY))
         # The player button list.
         self.player_buttons = []
         # The card list.
@@ -420,12 +422,19 @@ class GameScene(BaseScene):
         """Place the widgets in their proper place on screen."""
         self.address_text.rect.midtop = self.screen_rect.midtop
         self.client_status.rect.midtop = self.address_text.rect.midbottom
+        self.deck_status.rect.midtop = self.client_status.rect.midbottom
 
     def update_client_status(self, status):
         """Called from the PieClient on certain Network events.
         Updates the client status bar."""
         self.client_status = Widget(DEFAULT_FONT.render(status, True, BLACK, GRAY))
         self.client_status.rect.midtop = self.address_text.rect.midbottom
+
+    def update_deck_status(self, status):
+        """Called from the PieClient on certain Network events.
+        Updates the deck status bar."""
+        self.deck_status = Widget(DEFAULT_FONT.render(status, True, BLACK, GRAY))
+        self.deck_status.rect.midtop = self.client_status.rect.midbottom
 
     def update_stats(self, stats):
         """Called from the PieClient on certain Network events.
@@ -434,11 +443,13 @@ class GameScene(BaseScene):
         self.player_buttons = []
         # Create the new stats.
         for player_id, stat in enumerate(stats):
-            if player_id != self.client.player_id:
-                w = Widget(make_player_button(player_id, stat[0], stat[1]), player_id)
-                w.rect.top = self.client_status.rect.bottom + 20
-                w.rect.left = player_id * 100
-                self.player_buttons.append(w)
+            w = Widget(make_player_button(player_id, stat[0], stat[1], self.client.player_id), player_id)
+            w.rect.top = self.deck_status.rect.bottom + 20
+            if len(self.player_buttons):
+                w.rect.left = self.player_buttons[-1].rect.right + 10
+            else:
+                w.rect.left = 10
+            self.player_buttons.append(w)
 
     def update_cards(self, cards):
         """Called from the PieClient on certain Network events.
@@ -501,6 +512,9 @@ class GameScene(BaseScene):
                     # Get the player asked.
                     for player in self.player_buttons:
                         if player.rect.collidepoint(event.pos):
+                            # Don't ask yourself for a card.
+                            if self.player_buttons.index(player) == self.client.player_id:
+                                continue
                             # Only send data if a card has been picked.
                             if self.card is not None:
                                 self.client.Send({"action": "ask",
@@ -523,6 +537,7 @@ class GameScene(BaseScene):
         # Display widgets.
         self.address_text.draw(screen)
         self.client_status.draw(screen)
+        self.deck_status.draw(screen)
         for button in self.player_buttons:
             button.draw(screen)
         for card in self.card_widgets:
