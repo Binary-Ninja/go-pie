@@ -20,6 +20,7 @@ __all__ = [
     # Images.
     "card_images",
     "make_player_button",
+    "create_button_image",
     # Misc.
     "ranks_to_pie",
     "VALID_CHARS",
@@ -46,6 +47,18 @@ DARK_TAN = (238, 232, 213)
 # The button image.
 BUTTON_IMG = pg.image.load(str(Path() / "img" / "button.png"))
 
+
+# Create a button image function.
+def create_button_image(text: str) -> pg.Surface:
+    """Creates a simple one line button image with black text.
+    Optionally adds a red tint to the button with 25% opacity."""
+    text_surf = DEFAULT_FONT.render(text, True, BLACK)
+    surface = pg.transform.scale(BUTTON_IMG.convert_alpha(),
+                                 (text_surf.get_width() + 10, text_surf.get_height() + 10))
+    surface.blit(text_surf, (5, 5))
+    return surface
+
+
 # The ranks, translated into card images.
 ranks_to_pie = {
     "A": "Apple-Pie.png",
@@ -62,7 +75,6 @@ ranks_to_pie = {
     "Q": "Raspberry-Pi.png",
     "K": "Banana-Cream-Pie.png",
 }
-
 
 # Load the card images.
 card_images = {}

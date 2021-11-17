@@ -121,9 +121,9 @@ class StartScene(BaseScene):
     def __init__(self, screen_rect):
         super().__init__(screen_rect)
         # Create the widgets.
-        self.host_button = Widget(DEFAULT_FONT.render("(H)ost Server", True, BLACK, GRAY))
-        self.join_button = Widget(DEFAULT_FONT.render("(J)oin Server", True, BLACK, GRAY))
-        self.quit_button = Widget(DEFAULT_FONT.render("(ESC) Quit", True, BLACK, GRAY))
+        self.host_button = Widget(create_button_image("(H)ost Server"))
+        self.join_button = Widget(create_button_image("(J)oin Server"))
+        self.quit_button = Widget(create_button_image("(ESC) Quit"))
         # Position the widgets on the screen.
         self.position_widgets()
 
@@ -174,8 +174,8 @@ class HostScene(BaseScene):
     def __init__(self, screen_rect):
         super().__init__(screen_rect)
         # Create the widgets.
-        self.start_button = Widget(DEFAULT_FONT.render("(ENTER) Start Server", True, BLACK, GRAY))
-        self.back_button = Widget(DEFAULT_FONT.render("(ESC) Main Menu", True, BLACK, GRAY))
+        self.start_button = Widget(create_button_image("(ENTER) Start Server"))
+        self.back_button = Widget(create_button_image("(ESC) Main Menu"))
         # Create the public checkbox.
         self.public = PUBLIC_SERVER
         self.public_button = Widget(DEFAULT_FONT.render(f"Public: {self.public}", True, BLACK, GRAY))
@@ -183,8 +183,8 @@ class HostScene(BaseScene):
         self.number_of_players = 2  # The minimum number of players.
         self.number_box = Widget(DEFAULT_FONT.render(f"Players: {self.number_of_players}",
                                                      True, BLACK, GRAY))
-        self.left_arrow = Widget(DEFAULT_FONT.render("< ", True, GRAY, BLACK))
-        self.right_arrow = Widget(DEFAULT_FONT.render(" >", True, GRAY, BLACK))
+        self.left_arrow = Widget(create_button_image("< "))
+        self.right_arrow = Widget(create_button_image(" >"))
         # Position the widgets on the screen.
         self.position_widgets()
 
@@ -282,8 +282,8 @@ class JoinScene(BaseScene):
     def __init__(self, screen_rect):
         super().__init__(screen_rect)
         # Create the widgets.
-        self.start_button = Widget(DEFAULT_FONT.render("(ENTER) Join Server", True, BLACK, GRAY))
-        self.back_button = Widget(DEFAULT_FONT.render("(ESC) Main Menu", True, BLACK, GRAY))
+        self.start_button = Widget(create_button_image("(ENTER) Join Server"))
+        self.back_button = Widget(create_button_image("(ESC) Main Menu"))
         # Create the text box.
         self.text = f"{DEFAULT_HOST}:{DEFAULT_PORT}"
         self.text_box = Widget(DEFAULT_FONT.render("Address: " + self.text, True, BLACK, GRAY))
@@ -343,6 +343,10 @@ class JoinScene(BaseScene):
                         self.next_scene = NextScene.START
 
     def draw(self, screen):
+        # Display the typing controls right below the FPS.
+        screen.blit(DEFAULT_FONT.render("Type to modify the server address.",
+                                        True, BLACK), (0, DEFAULT_FONT.get_height()))
+        # Draw widgets.
         self.start_button.draw(screen)
         self.back_button.draw(screen)
         self.text_box.draw(screen)
@@ -533,6 +537,10 @@ class GameScene(BaseScene):
         # Display the card scale controls at top right.
         screen.blit(DEFAULT_FONT.render("UP/DOWN to scale cards.", True, BLACK),
                     (self.screen_rect.right - DEFAULT_FONT.size("UP/DOWN to scale cards.")[0], 0))
+        # Display the game instructions at top right.
+        screen.blit(DEFAULT_FONT.render("Click card then click player.", True, BLACK),
+                    (self.screen_rect.right - DEFAULT_FONT.size("Click card then click player.")[0],
+                     DEFAULT_FONT.get_height()))
 
         # Display widgets.
         self.address_text.draw(screen)
